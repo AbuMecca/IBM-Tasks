@@ -1,0 +1,28 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+    - name: Build and Push Docker Image
+      run: |
+        podman build -t username/myapp:${{ github.sha }} .
+        podman push username/myapp:${{ github.sha }} docker://docker.io/username/myapp:${{ github.sha }}
+    - name: SonarQube Scan
+      run: |
+        podman run --rm -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f deployment.yaml
