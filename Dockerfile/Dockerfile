@@ -4,7 +4,7 @@ COPY package.json /app/
 
 COPY src /app/
 
-WORKDIR /app
+WORKDIR /app .
 
 RUN npm install
 
