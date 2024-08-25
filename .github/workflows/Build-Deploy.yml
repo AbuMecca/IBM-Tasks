@@ -22,7 +22,6 @@ jobs:
 
     - name: Build Docker image with Podman
       run: |
-        cd IBM-Tasks/Dockerfile
         podman build -t username/myapp:${{ github.sha }} .
 
     - name: Push Docker image to registry
