@@ -14,12 +14,12 @@ jobs:
        
     - name: Checkout code
       uses: actions/checkout@v2
+      
+    - name: List files in the build context
+      run: ls -R /home/runner/work/IBM-Tasks/IBM-Tasks
 
     - name: Set up minikube
       uses: sagikazarmark/setup-minikube-action@v0
-
-    - name: Launch minikube cluster
-      run: minikube start
 
     - name: Set up Podman
       run: |
