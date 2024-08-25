@@ -27,18 +27,19 @@ jobs:
         sudo apt-get install -y podman
     - name: Build Docker image with Podman
       run: |
-        podman build -t username/myapp:${{ github.sha }} .
+        podman build -t docker.io/username/myapp:${{ github.sha }} .
     - name: List Docker images
       run: |
         podman images
 
     - name: Show Docker image details
       run: |
-        podman inspect amrhossam235/myapp:${{ github.sha }}
+        podman inspect docker.io/amrhossam235/myapp:${{ github.sha }}
 
     - name: Push Docker image to Docker Hub
       run: |
-        podman push amrhossam235/myapp:${{ github.sha }} docker://docker.io/amrhossam235/myapp:${{ github.sha }}
+        echo $DOCKER_PASSWORD | podman login --username $DOCKER_USERNAME --password-stdin docker.io
+        podman push docker.io/amrhossam235/myapp:${{ github.sha }} docker://docker.io/amrhossam235/myapp:${{ github.sha }}
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
