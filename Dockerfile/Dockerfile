@@ -1,6 +1,6 @@
 FROM node:22-alpine
 
-COPY IBM-Tasks/Dockerfile/package.json /app/
+COPY package.json /app/
 
 COPY src /app/
 
