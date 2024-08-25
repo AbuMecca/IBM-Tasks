@@ -11,14 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-       
     - name: Checkout code
       uses: actions/checkout@v2
       
     - name: List files in the build context
       run: ls -R /home/runner/work/IBM-Tasks/IBM-Tasks
 
-    - name: Set up minikube
+    - name: Set up Minikube
       uses: sagikazarmark/setup-minikube-action@v0
 
     - name: Set up Podman
@@ -28,11 +27,15 @@ jobs:
 
     - name: Build Docker image with Podman
       run: |
-        podman build -t username/myapp:${{ github.sha }} .
+        podman build -t username/myapp:${{ github.sha }} -f Dockerfile/Dockerfile Dockerfile/
 
     - name: Push Docker image to registry
       run: |
+        echo $DOCKER_PASSWORD | podman login --username $DOCKER_USERNAME --password-stdin docker.io
         podman push username/myapp:${{ github.sha }} docker://docker.io/username/myapp:${{ github.sha }}
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Set up Kubectl
       run: |
@@ -40,4 +43,4 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f deployment.yaml
+        kubectl apply -f Deployment/deployment.yaml
