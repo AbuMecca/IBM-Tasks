@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
+    - name: Change to Dockerfile directory
+      run: cd IBM-Tasks/Dockerfile
+      
     - name: Checkout code
       uses: actions/checkout@v2
 
