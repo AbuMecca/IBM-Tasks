@@ -15,6 +15,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up minikube
+      uses: sagikazarmark/setup-minikube-action@v0
+
+    - name: Launch minikube cluster
+      run: minikube start
+
     - name: Set up Podman
       run: |
         sudo apt-get update
