@@ -20,7 +20,6 @@ jobs:
       run: |
       - name: Build and Push Docker Image
   run: |
-    cd IBM-Tasks\Dockerfile\package.json
     podman build -t username/myapp:${{ github.sha }} .
     podman push username/myapp:${{ github.sha }} docker://docker.io/username/myapp:${{ github.sha }}
 
