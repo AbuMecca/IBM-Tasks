@@ -30,7 +30,10 @@ jobs:
         podman build -t username/myapp:${{ github.sha }} .
     - name: Push Docker image to registry
       run: |
-        podman push username/myapp:${{ github.sha }} docker://docker.io/username/myapp:${{ github.sha }}
+        podman push amrhossam235/myapp:${{ github.sha }} docker://docker.io/amrhossam235/myapp:${{ github.sha }}
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: Set up Kubectl
       run: |
         sudo apt-get install -y kubectl
