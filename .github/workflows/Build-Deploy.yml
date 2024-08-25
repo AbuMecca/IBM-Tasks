@@ -11,10 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
-    - name: Change to Dockerfile directory
-      run: cd IBM-Tasks/Dockerfile
-      
+       
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -25,6 +22,7 @@ jobs:
 
     - name: Build Docker image with Podman
       run: |
+        cd IBM-Tasks/Dockerfile
         podman build -t username/myapp:${{ github.sha }} .
 
     - name: Push Docker image to registry
