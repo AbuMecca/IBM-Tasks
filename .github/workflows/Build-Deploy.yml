@@ -27,7 +27,7 @@ jobs:
         sudo apt-get install -y podman
     - name: Build Docker image with Podman
       run: |
-        podman build -t docker.io/username/myapp:${{ github.sha }} .
+        podman build -t docker.io/amrhossam235/myapp:${{ github.sha }} .
     - name: List Docker images
       run: |
         podman images
