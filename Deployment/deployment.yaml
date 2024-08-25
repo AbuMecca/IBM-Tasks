@@ -17,3 +17,4 @@ spec:
         image: docker.io/amrhossam235/node-app:latest
         ports:
         - containerPort: 3000
+        automountServiceAccountToken: false
