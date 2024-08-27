@@ -31,6 +31,9 @@ jobs:
       - name: List files in the build context
         run: ls -R /home/runner/work/IBM-Tasks/IBM-Tasks
 
+      - name: Install conntrack
+        run: sudo apt-get install -y conntrack
+
       - name: Set up Minikube
         uses: sagikazarmark/setup-minikube-action@v0
          
