@@ -81,8 +81,6 @@ jobs:
     - name: Configure kubectl to use Minikube
       run: kubectl config use-context minikube
       
-    - name: Navigate to Deployment directory
-      run: cd Deployment
-      
-    - name: Deploy to Kubernetes
+    - name: Apply Kubernetes Deployment
+      working-directory: Deployment
       run: kubectl apply -f deployment.yaml
