@@ -9,6 +9,7 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    needs: SonarCloud
     steps:
        
     - name: Checkout code
