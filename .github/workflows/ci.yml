@@ -7,27 +7,23 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+ name: Sonar-Scanner
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarcloud:
+    name: SonarCloud
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Podman
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y podman
-    - name: Build and Push Docker Image
-      run: |
-      - name: Build and Push Docker Image
-  run: |
-    podman build -t username/myapp:${{ github.sha }} .
-    podman push username/myapp:${{ github.sha }} docker://docker.io/username/myapp:${{ github.sha }}
-
-        podman build -t username/myapp:${{ github.sha }} .
-        podman push username/myapp:${{ github.sha }} docker://docker.io/username/myapp:${{ github.sha }}
-    - name: SonarQube Scan
-      run: |
-        podman run --rm -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f deployment.yaml
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
