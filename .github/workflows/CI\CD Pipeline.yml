@@ -65,11 +65,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Install Kubernetes
-        run: sudo apt-get install -y kubectl
+    - name: Set up minikube
+      uses: sagikazarmark/setup-minikube-action@v0
+         
+    - name: Start Minikube
+      run: |
+        minikube start
         
-      - name: Configure kubectl to use Minikube
-        run: kubectl config use-context minikube
+    - name: Install Kubernetes
+      run: sudo apt-get install -y kubectl
         
-      - name: Deploy to Kubernetes
-        run: kubectl apply -f Deployment/deployment.yaml
+    - name: Configure kubectl to use Minikube
+      run: kubectl config use-context minikube
+        
+    - name: Deploy to Kubernetes
+      run: kubectl apply -f Deployment/deployment.yaml
