@@ -65,6 +65,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
     - name: Set up minikube
       uses: sagikazarmark/setup-minikube-action@v0
          
@@ -77,6 +80,9 @@ jobs:
         
     - name: Configure kubectl to use Minikube
       run: kubectl config use-context minikube
-        
+      
+    - name: Navigate to Deployment directory
+      run: cd Deployment
+      
     - name: Deploy to Kubernetes
-      run: kubectl apply -f Deployment/deployment.yaml
+      run: kubectl apply -f deployment.yaml
