@@ -35,7 +35,14 @@ jobs:
         uses: sagikazarmark/setup-minikube-action@v0
          
       - name: Start Minikube
-        run: minikube start
+        run: |
+          sudo minikube start --driver=none
+          sudo minikube status
+          kubectl config get-contexts
+
+      - name: Manually Set Minikube Context (if not available)
+        run: |
+          kubectl config set-context minikube --cluster=minikube --user=minikube
 
       - name: Set up Podman
         run: |
@@ -60,7 +67,6 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         
   deploy:
-   
     runs-on: ubuntu-latest
     needs: build
     steps:
