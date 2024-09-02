@@ -8,9 +8,36 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
+  detect-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install detect-secrets
+        run: pip install --upgrade "git+https://github.com/ibm/detect-secrets.git@master#egg=detect-secrets"
+
+      - name: Initialize detect-secrets baseline if not exists
+        run: |
+          if [ ! -f .secrets.baseline ]; then
+            detect-secrets scan > .secrets.baseline
+          fi
+
+      - name: Run detect-secrets scan and update baseline
+        run: detect-secrets scan --update .secrets.baseline
+
+      - name: Audit detect-secrets baseline
+        run: detect-secrets audit .secrets.baseline
+
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
+    needs: detect-secrets
     steps:
       - uses: actions/checkout@v3
         with:
@@ -84,21 +111,3 @@ jobs:
     - name: Apply Kubernetes Deployment
       working-directory: Deployment
       run: kubectl apply -f deployment.yaml
-
-  detect-secrets:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Install detect-secrets
-        run: pip install --upgrade "git+https://github.com/ibm/detect-secrets.git@master#egg=detect-secrets"
-
-      - name: Run detect-secrets scan
-        run: detect-secrets scan --update .secrets.baseline
