@@ -22,17 +22,12 @@ jobs:
       - name: Install detect-secrets
         run: pip install --upgrade "git+https://github.com/ibm/detect-secrets.git@master#egg=detect-secrets"
 
-      - name: Initialize detect-secrets baseline if not exists
-        run: |
-          if [ ! -f .secrets.baseline ]; then
-            detect-secrets scan > .secrets.baseline
-          fi
-
-      - name: Run detect-secrets scan and update baseline
-        run: detect-secrets scan --update .secrets.baseline
+      - name: Run detect-secrets scan
+        run: detect-secrets scan --all-files --update .secrets.baseline
 
       - name: Audit detect-secrets baseline
         run: detect-secrets audit .secrets.baseline
+
 
   sonarcloud:
     name: SonarCloud
