@@ -1,7 +1,8 @@
 FROM node:22-alpine
 
-COPY package.json /app/
-COPY src /app/
+COPY Dockerfile/package.json /app/
+
+COPY Dockerfile/src /app/
 
 WORKDIR /app
 

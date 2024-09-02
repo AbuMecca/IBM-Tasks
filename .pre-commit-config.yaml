@@ -1,0 +1,5 @@
+-   repo: git+https://github.com/ibm/detect-secrets.git
+    rev: master  # Use the specific version or branch you prefer
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]

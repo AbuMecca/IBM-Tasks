@@ -1,0 +1,113 @@
+name: CI_CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  detect-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install detect-secrets
+        run: pip install --upgrade "git+https://github.com/ibm/detect-secrets.git@master#egg=detect-secrets"
+
+      - name: Initialize detect-secrets baseline if not exists
+        run: |
+          if [ ! -f .secrets.baseline ]; then
+            detect-secrets scan > .secrets.baseline
+          fi
+
+      - name: Run detect-secrets scan and update baseline
+        run: detect-secrets scan --update .secrets.baseline
+
+      - name: Audit detect-secrets baseline
+        run: detect-secrets audit .secrets.baseline
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: detect-secrets
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better relevancy of analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: sonarcloud
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: List files in the build context
+      run: ls -R /home/runner/work/IBM-Tasks/IBM-Tasks
+
+    - name: Set up minikube
+      uses: sagikazarmark/setup-minikube-action@v0
+         
+    - name: Start Minikube
+      run: |
+        minikube start
+
+    - name: Set up Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+    - name: Build Docker image with Podman
+      run: |
+        podman build -t docker.io/amrhossam235/myapp:${{ github.sha }} .
+    - name: List Docker images
+      run: |
+        podman images
+
+    - name: Show Docker image details
+      run: |
+        podman inspect docker.io/amrhossam235/myapp:${{ github.sha }}
+
+    - name: Push Docker image to Docker Hub
+      run: |
+        echo $DOCKER_PASSWORD | podman login --username $DOCKER_USERNAME --password-stdin docker.io
+        podman push docker.io/amrhossam235/myapp:${{ github.sha }} docker://docker.io/amrhossam235/myapp:${{ github.sha }}
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up minikube
+      uses: sagikazarmark/setup-minikube-action@v0
+         
+    - name: Start Minikube
+      run: |
+        minikube start
+        
+    - name: Install Kubernetes
+      run: sudo apt-get install -y kubectl
+        
+    - name: Configure kubectl to use Minikube
+      run: kubectl config use-context minikube
+      
+    - name: Apply Kubernetes Deployment
+      working-directory: Deployment
+      run: kubectl apply -f deployment.yaml
