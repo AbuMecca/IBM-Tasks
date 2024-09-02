@@ -1,5 +1,6 @@
--   repo: git+https://github.com/ibm/detect-secrets.git
-    rev: master  # Use the specific version or branch you prefer
+repos:
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0  # Specify the version of detect-secrets you want to use
     hooks:
       - id: detect-secrets
-        args: [--baseline, .secrets.baseline]
+        args: ['--baseline', '.secrets.baseline']
